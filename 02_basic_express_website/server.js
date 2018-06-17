@@ -13,7 +13,43 @@ app.use(bodyParser.urlencoded({extended: false}));
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/', function(req, res){
-    res.render('index');
+    res.render('index', {title: 'Welcome'});
+});
+
+app.get('/about', function(req, res){
+    res.render('about');
+});
+
+app.get('/contact', function(req, res){
+    res.render('contact');
+});
+
+app.post('/contact/send', function(req, res){
+    var transporter = nodemailer.createTransport({
+        service: "Gmail",
+        auth: {
+            user: "xxxxxx@gmail.com",
+            pass: "xxxxxx"
+        }
+    });
+
+    var mailOptions ={
+        from: "Ryan <xxxxxx@gmail.com>",
+        to: "genericemail@someone.com",
+        subject: "Website Submission",
+        text: "You have mail.... Name: " + req.body.name + " Email: " + req.body.email + " Message: " + req.body.message,
+        html: "<p>You have mail</p>"
+    };
+
+    transporter.sendMail(mailOptions, function(error, info){
+        if (error){
+            console.log(error);
+            res.redirect('/');
+        } else {
+            console.log('Message sent! ' + info.response);
+            res.redirect('/');
+        }
+    });
 });
 
 app.listen(3000);
